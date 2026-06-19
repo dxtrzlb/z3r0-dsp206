@@ -86,6 +86,12 @@
   - Verify: on hardware — bars move with input; muting In A drops routed Out meters (§7).
   - Files: `src/renderer/components/Meters.tsx`.
 
+> **SUPERSEDED (2026-06-19):** Phases 5–6 below are now absorbed into the remote-control rework —
+> see [REMOTE-CONTROL.md](REMOTE-CONTROL.md) and the **R0–R5** section at the bottom of this file.
+> The Frequency-View desktop UI is no longer built directly against IPC; it becomes a **client of
+> the hub** in **R3**. Build the hub foundation (R0–R2) first. The screen designs in Phase 5/6
+> still stand — only their wiring changes.
+
 ## Phase 5 — Frequency-view UI  *(redesign — see [PLAN.md](PLAN.md) Phase E)*
 
 > Layout: top bar + always-on Output Overview Bar; left rail = Inputs + Routing; center =
@@ -164,3 +170,55 @@
 - `node-hid` — transport.
 - `react`, `react-dom`, `zustand` — renderer.
 - `electron-builder` — packaging.
+
+---
+
+## Remote-control rework (R0–R5)  *(active plan — see [REMOTE-CONTROL.md](REMOTE-CONTROL.md))*
+
+> Foundation-first. Goal: control the DSP from the desktop app, a native iPad app, and LLM agents
+> (Claude Code/Hermes via MCP + HTTP). Hub = the Electron app (owns USB + serves the network API).
+> One **command registry** drives IPC, WS, REST, OpenAPI, MCP, and shared types.
+
+- [ ] **R0 — Monorepo + extract `packages/core`**
+  - Acceptance: workspaces layout (`packages/core`, `apps/desktop`, later `apps/ipad`,
+    `packages/mcp`); protocol/codecs/commands/types + tests move into `packages/core`; desktop
+    imports from it. No behaviour change.
+  - Verify: `npm test` (40+) + `npm run typecheck` green from the new layout; app still launches.
+
+- [ ] **R1 — Command registry + canonical state in hub**
+  - Acceptance: builders → registry (name + zod params + description + `destructive` flag + `apply`);
+    Electron main owns `DspState`; IPC dispatches through the registry; renderer store becomes a
+    synced mirror; read queries (`getState`/`getMeters`/`getHealth`) + first macros.
+  - Verify: every existing control still works end-to-end via the registry; registry round-trip tests.
+
+- [ ] **R2 — Embedded HTTP + WS server in Electron main**
+  - Acceptance: WS (snapshot + schema on connect, command dispatch, state/meter broadcast) + REST
+    (`/api/command`, `/api/state`, `/api/schema`, `/openapi.json`); pairing token auth; LAN bind;
+    mDNS `_dsp206._tcp` advertisement.
+  - Verify: a CLI/WS client connects, authenticates, sets gain, sees the broadcast; desktop stays in sync.
+
+- [ ] **R3 — Desktop Frequency-View UI as a hub client** *(absorbs old Phase 5/6 screens)*
+  - Acceptance: the redesigned UI (top bar + Output Overview Bar, Frequency View graph, routing,
+    Output Editor incl. slope + polarity, GEQ, Safety/Party, PresetBar) built against the synced
+    store/hub API; slope dropdown wired (ladder from the protocol doc); test-tone generator control.
+  - Verify: on hardware — controls move the device; multi-client sync with a second connected client.
+
+- [ ] **R4 — MCP server + OpenAPI**
+  - Acceptance: `packages/mcp` generates tools from `/api/schema`; destructive tools require confirm;
+    read tools + macros for "auto-set"; `/openapi.json` usable by Hermes/other agents.
+  - Verify: Claude Code lists + calls the tools; a prompt sets gain/crossover and the change lands +
+    is reflected back in a state snapshot.
+
+- [ ] **R5 — React Native / Expo iPad app**
+  - Acceptance: Expo app, WS+REST client, Bonjour discovery + pairing, touch-optimised screens
+    (Frequency View, output bar, routing, presets, Safety/Party); reuses `packages/core` types/schema.
+  - Verify: on an iPad over WiFi — discovers the hub, pairs, controls the device live; meters stream.
+
+- [ ] **R6 — Packaging** *(was 6.2/6.4)*
+  - Acceptance: electron-builder desktop build (Windows + macOS); Expo build for the iPad app.
+  - Verify: installable desktop build runs; iPad app installs and connects.
+
+### Decide during R0–R2
+- The macro/intent set the LLM exposes ("auto-set" scenarios — to be specified by the owner).
+- Pairing UX (QR vs code) + token storage on iPad.
+- Whether a future headless hub mode is wanted (out of scope for now).
