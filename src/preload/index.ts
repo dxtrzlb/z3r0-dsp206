@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
-import type { CommandName } from '../main/ipc';
+import type { CommandName, CommandParams, DspState } from '@z3r0/core';
 import type { SessionStatus } from '../main/device/session';
 import type { DeviceInfo } from '../main/device/hid';
 
@@ -9,8 +9,9 @@ const api = {
   isPresent: (): Promise<boolean> => ipcRenderer.invoke('dsp:isPresent'),
   deviceInfo: (): Promise<DeviceInfo | null> => ipcRenderer.invoke('dsp:deviceInfo'),
   sync: (): Promise<void> => ipcRenderer.invoke('dsp:sync'),
-  send: (name: CommandName, ...args: unknown[]): Promise<void> =>
-    ipcRenderer.invoke('dsp:command', name, args),
+  getState: (): Promise<DspState> => ipcRenderer.invoke('dsp:getState'),
+  dispatch: <N extends CommandName>(name: N, params: CommandParams[N]): Promise<{ ok: true }> =>
+    ipcRenderer.invoke('dsp:dispatch', name, params),
   onStatus: (cb: (status: SessionStatus, detail?: string) => void): (() => void) => {
     const h = (_e: IpcRendererEvent, status: SessionStatus, detail?: string) => cb(status, detail);
     ipcRenderer.on('dsp:status', h);
@@ -20,6 +21,11 @@ const api = {
     const h = (_e: IpcRendererEvent, levels: number[]) => cb(levels);
     ipcRenderer.on('dsp:meters', h);
     return () => ipcRenderer.removeListener('dsp:meters', h);
+  },
+  onState: (cb: (state: DspState) => void): (() => void) => {
+    const h = (_e: IpcRendererEvent, state: DspState) => cb(state);
+    ipcRenderer.on('dsp:state', h);
+    return () => ipcRenderer.removeListener('dsp:state', h);
   },
 };
 
