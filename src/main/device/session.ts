@@ -2,8 +2,7 @@
 // The hard rule (§1 mutual exclusion): the USB handle must be released on EVERY exit path,
 // or the official editor hangs at "uploading parameters 0%". The safety net below enforces it.
 import { openDevice, findDevice, type DspHandle } from './hid';
-import { handshake, keepalive } from './commands';
-import { isMeterFrame, parseDisplayMeters } from './meters';
+import { handshake, keepalive, isMeterFrame, parseDisplayMeters } from '@z3r0/core';
 
 const KEEPALIVE_MS = 130;
 

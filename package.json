@@ -5,16 +5,20 @@
   "type": "module",
   "private": true,
   "main": "./out/main/index.js",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "dev": "electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
     "package": "npm run build && electron-builder",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "test": "npm run test --workspaces --if-present",
     "lint": "eslint . --fix",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck -w @z3r0/core"
   },
   "dependencies": {
+    "@z3r0/core": "*",
     "node-hid": "^3.3.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

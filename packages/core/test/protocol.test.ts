@@ -19,7 +19,7 @@ import {
   dynTimeMsFromRaw,
   FREQ_MIN,
   FREQ_MAX,
-} from '../src/main/device/protocol';
+} from '../src/protocol';
 import {
   handshake,
   keepalive,
@@ -40,13 +40,13 @@ import {
   loadPreset,
   storePreset,
   setPresetName,
-} from '../src/main/device/commands';
+} from '../src/commands';
 import {
   decodeFloat16,
   isMeterFrame,
   parseMeters,
   parseDisplayMeters,
-} from '../src/main/device/meters';
+} from '../src/meters';
 
 // payload = bytes between 10 02 and 10 03
 const payloadOf = (f: number[]) => f.slice(2, f.length - 3);

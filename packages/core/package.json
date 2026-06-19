@@ -1,0 +1,15 @@
+{
+  "name": "@z3r0/core",
+  "version": "0.1.0",
+  "description": "Shared DSP 206 protocol, codecs, command builders, and types",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}

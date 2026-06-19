@@ -2,7 +2,7 @@
 import { ipcMain, type BrowserWindow } from 'electron';
 import { DspSession } from './device/session';
 import { getDeviceInfo } from './device/hid';
-import * as cmd from './device/commands';
+import * as cmd from '@z3r0/core';
 
 // Whitelist of command builders the renderer may invoke by name.
 const builders = {
