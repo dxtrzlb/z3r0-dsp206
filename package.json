@@ -13,15 +13,17 @@
     "dev": "electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
     "package": "npm run build && electron-builder",
-    "test": "npm run test --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present && vitest run",
     "lint": "eslint . --fix",
     "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck -w @z3r0/core"
   },
   "dependencies": {
     "@z3r0/core": "*",
+    "bonjour-service": "^1.4.1",
     "node-hid": "^3.3.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "ws": "^8.21.0",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
@@ -29,6 +31,7 @@
     "@types/node": "^26.0.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^8.61.1",
     "@typescript-eslint/parser": "^8.61.1",
     "@vitejs/plugin-react": "^4.7.0",

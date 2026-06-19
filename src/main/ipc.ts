@@ -5,15 +5,22 @@ import { DspSession } from './device/session';
 import { getDeviceInfo } from './device/hid';
 import { Hub } from './hub';
 
-export function registerIpc(getWindow: () => BrowserWindow | null): DspSession {
+export interface DspBackend {
+  session: DspSession;
+  hub: Hub;
+}
+
+export function registerIpc(getWindow: () => BrowserWindow | null): DspBackend {
+  let hub!: Hub;
   const session = new DspSession({
-    onMeters: (levels) => {
-      hub.setMeters(levels);
-      getWindow()?.webContents.send('dsp:meters', levels);
-    },
+    onMeters: (levels) => hub.pushMeters(levels),
     onStatus: (status, detail) => getWindow()?.webContents.send('dsp:status', status, detail),
   });
-  const hub = new Hub(session, (s) => getWindow()?.webContents.send('dsp:state', s));
+  hub = new Hub(session);
+
+  // Fan canonical state + meters out to the renderer (the WS server subscribes separately).
+  hub.onState((s) => getWindow()?.webContents.send('dsp:state', s));
+  hub.onMeters((m) => getWindow()?.webContents.send('dsp:meters', m));
 
   ipcMain.handle('dsp:connect', () => session.connect());
   ipcMain.handle('dsp:disconnect', () => session.disconnect());
@@ -28,5 +35,5 @@ export function registerIpc(getWindow: () => BrowserWindow | null): DspSession {
   });
   ipcMain.handle('dsp:dispatch', (_e, name: CommandName, params: unknown) => hub.dispatch(name, params));
 
-  return session;
+  return { session, hub };
 }
