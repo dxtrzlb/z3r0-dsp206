@@ -12,6 +12,7 @@
   --meter-hot: #ff5b5b;
   --in: #4ea1ff;
   --out: #b07bff;
+  --fader-len: 150px;
 }
 
 * {
@@ -336,12 +337,12 @@ body {
   display: flex;
   gap: 14px;
   justify-content: center;
-  align-items: stretch;
-  height: 190px;
+  align-items: center;
 }
 
 .meter {
   width: 14px;
+  height: var(--fader-len);
   background: #0a0b0f;
   border-radius: 6px;
   position: relative;
@@ -384,10 +385,16 @@ body {
   font-size: 10px;
   color: var(--muted);
 }
+.fader-track {
+  height: var(--fader-len);
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .fader {
-  writing-mode: vertical-rl;
-  width: 26px;
-  flex: 1;
+  width: var(--fader-len);
+  transform: rotate(-90deg);
   accent-color: var(--accent);
   cursor: pointer;
 }
