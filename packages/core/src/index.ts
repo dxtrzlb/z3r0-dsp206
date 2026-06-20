@@ -5,3 +5,4 @@ export * from './state';
 export * from './eq';
 export * from './health';
 export * from './registry';
+export * from './openapi';

@@ -1,0 +1,14 @@
+{
+  "name": "@z3r0/mcp",
+  "version": "0.1.0",
+  "description": "Model Context Protocol stdio server bridging an LLM (Claude Code, etc.) to the z3r0 DSP 206 hub",
+  "type": "module",
+  "private": true,
+  "bin": { "dsp206-mcp": "./dist/index.js" },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}

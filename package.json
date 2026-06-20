@@ -16,7 +16,7 @@
     "package": "npm run build && electron-builder",
     "test": "npm run test --workspaces --if-present && vitest run",
     "lint": "eslint . --fix",
-    "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck -w @z3r0/core"
+    "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck -w @z3r0/core && npm run typecheck -w @z3r0/mcp"
   },
   "dependencies": {
     "@z3r0/core": "*",

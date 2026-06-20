@@ -5,7 +5,7 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import { randomInt, randomUUID } from 'node:crypto';
 import { WebSocketServer, WebSocket } from 'ws';
 import { Bonjour, type Service } from 'bonjour-service';
-import { commandList, type CommandName } from '@z3r0/core';
+import { commandList, commandSchemas, buildOpenApi, type CommandName } from '@z3r0/core';
 import type { Hub } from './hub';
 
 export interface ServerOptions {
@@ -47,6 +47,10 @@ function readJson(req: IncomingMessage): Promise<unknown> {
 export async function startServer(hub: Hub, opts: ServerOptions = {}): Promise<ServerHandle> {
   const code = String(randomInt(0, 1_000_000)).padStart(6, '0'); // 6-digit pairing code
   const tokens = new Set<string>();
+  // Optional shared token for headless agents (MCP / Hermes): if the hub and the agent both
+  // read DSP206_TOKEN from env, the agent skips interactive code pairing. Ignored if too short.
+  const staticToken = process.env.DSP206_TOKEN;
+  if (staticToken && staticToken.length >= 8) tokens.add(staticToken);
 
   const tokenOf = (auth?: string): string | undefined =>
     auth?.startsWith('Bearer ') ? auth.slice(7) : undefined;
@@ -73,16 +77,31 @@ export async function startServer(hub: Hub, opts: ServerOptions = {}): Promise<S
         }
         return sendJson(res, 401, { error: 'bad pairing code' });
       }
+      if (method === 'GET' && pathname === '/openapi.json') {
+        const host = req.headers.host ?? `localhost:${DEFAULT_PORT}`;
+        return sendJson(res, 200, buildOpenApi({ servers: [`http://${host}`] }));
+      }
       if (!authed(req)) return sendJson(res, 401, { error: 'unauthorized' });
 
       if (method === 'GET' && pathname === '/api/state') return sendJson(res, 200, hub.getState());
       if (method === 'GET' && pathname === '/api/meters') return sendJson(res, 200, hub.getMeters());
       if (method === 'GET' && pathname === '/api/schema')
-        return sendJson(res, 200, { commands: commandList() });
+        return sendJson(res, 200, { commands: commandSchemas() });
       if (method === 'POST' && pathname === '/api/command') {
         const body = (await readJson(req)) as { name?: CommandName; params?: unknown };
         try {
           hub.dispatch(body.name as CommandName, body.params);
+          return sendJson(res, 200, { ok: true });
+        } catch (e) {
+          return sendJson(res, 400, { error: e instanceof Error ? e.message : String(e) });
+        }
+      }
+      // Per-command route — one URL per command, so the OpenAPI doc gives Hermes/LLMs a typed
+      // operation per command (body = that command's params). Backs the generated /openapi.json.
+      if (method === 'POST' && pathname.startsWith('/api/command/')) {
+        const name = decodeURIComponent(pathname.slice('/api/command/'.length)) as CommandName;
+        try {
+          hub.dispatch(name, await readJson(req));
           return sendJson(res, 200, { ok: true });
         } catch (e) {
           return sendJson(res, 400, { error: e instanceof Error ? e.message : String(e) });

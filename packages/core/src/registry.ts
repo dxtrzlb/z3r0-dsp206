@@ -358,13 +358,13 @@ export function dispatch(state: DspState, name: CommandName, rawParams: unknown)
   return def.apply(params as never, state);
 }
 
-// Machine-readable descriptor for clients/agents (drives OpenAPI + MCP later).
+// Machine-readable descriptor for clients/agents (drives OpenAPI + MCP).
 export interface CommandSchema {
   name: string;
   scope: 'channel' | 'global';
   description: string;
   destructive: boolean;
-  params: unknown; // JSON Schema (filled in at R4 via zod-to-json-schema)
+  params: Record<string, unknown>; // JSON Schema (draft 2020-12) of the command params
 }
 
 export const commandList = (): Omit<CommandSchema, 'params'>[] =>
@@ -374,3 +374,15 @@ export const commandList = (): Omit<CommandSchema, 'params'>[] =>
     description: COMMANDS[name].description,
     destructive: COMMANDS[name].destructive,
   }));
+
+// JSON Schema for a command's params, with zod's `$schema` marker stripped so it can be
+// embedded inline in an OpenAPI requestBody or an MCP tool inputSchema.
+export const paramsJsonSchema = (name: CommandName): Record<string, unknown> => {
+  const schema = z.toJSONSchema(COMMANDS[name].params) as Record<string, unknown>;
+  delete schema.$schema;
+  return schema;
+};
+
+// The full command catalog, params included — the single contract every remote client builds on.
+export const commandSchemas = (): CommandSchema[] =>
+  commandList().map((c) => ({ ...c, params: paramsJsonSchema(c.name as CommandName) }));

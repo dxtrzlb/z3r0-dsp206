@@ -109,6 +109,60 @@ describe('LAN server', () => {
     ws.close();
   });
 
+  it('serves /openapi.json unauthenticated with one operation per command', async () => {
+    const { hub } = makeHub();
+    srv = await startServer(hub, { port: 0, mdns: false });
+    const res = await fetch(`http://127.0.0.1:${srv.port}/openapi.json`);
+    expect(res.status).toBe(200);
+    const doc = (await res.json()) as {
+      openapi: string;
+      paths: Record<string, { post?: { operationId?: string } }>;
+    };
+    expect(doc.openapi).toBe('3.1.0');
+    expect(doc.paths['/api/command/setGain']?.post?.operationId).toBe('setGain');
+    expect(doc.paths['/api/command/loadPreset']?.post).toBeDefined();
+  });
+
+  it('/api/schema returns params JSON-Schema per command', async () => {
+    const { hub } = makeHub();
+    srv = await startServer(hub, { port: 0, mdns: false });
+    const token = await pair(srv.port, srv.code);
+    const res = await fetch(`http://127.0.0.1:${srv.port}/api/schema`, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    const body = (await res.json()) as { commands: Array<{ name: string; params: { type: string } }> };
+    const setGain = body.commands.find((c) => c.name === 'setGain');
+    expect(setGain?.params).toMatchObject({ type: 'object' });
+  });
+
+  it('dispatches via the per-command route POST /api/command/{name}', async () => {
+    const { hub, frames } = makeHub();
+    srv = await startServer(hub, { port: 0, mdns: false });
+    const token = await pair(srv.port, srv.code);
+    const res = await fetch(`http://127.0.0.1:${srv.port}/api/command/setGain`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+      body: JSON.stringify({ ch: 3, db: -12 }),
+    });
+    expect(res.status).toBe(200);
+    expect(hub.getState().channels[3].gainDb).toBe(-12);
+    expect(frames.length).toBe(1);
+  });
+
+  it('accepts a shared static token from DSP206_TOKEN (headless agent path)', async () => {
+    const { hub } = makeHub();
+    process.env.DSP206_TOKEN = 'static-test-token-1234';
+    try {
+      srv = await startServer(hub, { port: 0, mdns: false });
+      const res = await fetch(`http://127.0.0.1:${srv.port}/api/state`, {
+        headers: { authorization: 'Bearer static-test-token-1234' },
+      });
+      expect(res.status).toBe(200);
+    } finally {
+      delete process.env.DSP206_TOKEN;
+    }
+  });
+
   it('rejects a WS upgrade without a valid token', async () => {
     const { hub } = makeHub();
     srv = await startServer(hub, { port: 0, mdns: false });
