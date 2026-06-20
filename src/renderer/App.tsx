@@ -4,6 +4,8 @@ import { ChannelStrip } from './components/ChannelStrip';
 import { FreqView } from './components/FreqView';
 import { RoutingMatrix } from './components/RoutingMatrix';
 import { OutputEditor } from './components/OutputEditor';
+import { SafetyView } from './components/SafetyView';
+import { PartyView } from './components/PartyView';
 import { TopBar, type View } from './components/TopBar';
 
 const INPUTS = [0, 1];
@@ -83,12 +85,8 @@ export function App() {
         </div>
       )}
 
-      {view === 'safety' && (
-        <div className="view-placeholder">Safety Mode — fullscreen system health (coming)</div>
-      )}
-      {view === 'party' && (
-        <div className="view-placeholder">Party Mode — large monitor view (coming)</div>
-      )}
+      {view === 'safety' && <SafetyView />}
+      {view === 'party' && <PartyView />}
     </div>
   );
 }
