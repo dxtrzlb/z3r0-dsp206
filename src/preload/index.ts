@@ -10,7 +10,7 @@ const api = {
   deviceInfo: (): Promise<DeviceInfo | null> => ipcRenderer.invoke('dsp:deviceInfo'),
   sync: (): Promise<void> => ipcRenderer.invoke('dsp:sync'),
   getState: (): Promise<DspState> => ipcRenderer.invoke('dsp:getState'),
-  serverInfo: (): Promise<{ port: number; code: string } | null> =>
+  serverInfo: (): Promise<{ port: number; code: string; ip: string | null } | null> =>
     ipcRenderer.invoke('dsp:serverInfo'),
   dispatch: <N extends CommandName>(name: N, params: CommandParams[N]): Promise<{ ok: true }> =>
     ipcRenderer.invoke('dsp:dispatch', name, params),

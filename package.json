@@ -16,12 +16,13 @@
     "package": "npm run build && electron-builder",
     "test": "npm run test --workspaces --if-present && vitest run",
     "lint": "eslint . --fix",
-    "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck -w @z3r0/core && npm run typecheck -w @z3r0/mcp"
+    "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck -w @z3r0/core && npm run typecheck -w @z3r0/mcp && npm run typecheck -w @z3r0/ipad"
   },
   "dependencies": {
     "@z3r0/core": "*",
     "bonjour-service": "^1.4.1",
     "node-hid": "^3.3.0",
+    "qrcode": "^1.5.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "ws": "^8.21.0",
@@ -30,6 +31,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.0.0",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@types/ws": "^8.18.1",

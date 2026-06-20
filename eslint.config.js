@@ -3,7 +3,7 @@ import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 
 export default [
-  { ignores: ['**/out/**', '**/dist/**', '**/node_modules/**', 'spike.mjs'] },
+  { ignores: ['**/out/**', '**/dist/**', '**/node_modules/**', 'apps/ipad/**', 'spike.mjs'] },
   js.configs.recommended,
   {
     files: ['**/*.{ts,tsx}'],

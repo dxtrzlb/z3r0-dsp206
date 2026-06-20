@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { useStore, isInput } from '../store';
+import { TabletConnect } from './TabletConnect';
 
 export type View = 'edit' | 'safety' | 'party';
 const VIEWS: View[] = ['edit', 'safety', 'party'];
 
 export function TopBar({ view, setView }: { view: View; setView: (v: View) => void }) {
+  const [showTablet, setShowTablet] = useState(false);
   const status = useStore((s) => s.status);
   const detail = useStore((s) => s.detail);
   const device = useStore((s) => s.device);
@@ -18,6 +21,7 @@ export function TopBar({ view, setView }: { view: View; setView: (v: View) => vo
   const live = connected || demoMode;
 
   return (
+    <>
     <header className="topbar">
       <div className="brand">
         z3r0 <span>DSP 206</span>
@@ -38,6 +42,10 @@ export function TopBar({ view, setView }: { view: View; setView: (v: View) => vo
           disabled={!live}
         >
           {anyOutMuted ? 'Unmute all' : 'Mute all'}
+        </button>
+
+        <button className="btn" onClick={() => setShowTablet(true)}>
+          Tablet
         </button>
 
         <div className="device-label">
@@ -77,5 +85,7 @@ export function TopBar({ view, setView }: { view: View; setView: (v: View) => vo
         </button>
       </div>
     </header>
+    {showTablet && <TabletConnect onClose={() => setShowTablet(false)} />}
+    </>
   );
 }

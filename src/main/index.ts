@@ -1,7 +1,18 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'node:path';
+import { networkInterfaces } from 'node:os';
 import { registerIpc } from './ipc';
 import { startServer, type ServerHandle } from './server';
+
+// First non-internal IPv4 — the address a tablet on the same LAN uses to reach the hub.
+function lanIp(): string | null {
+  for (const addrs of Object.values(networkInterfaces())) {
+    for (const ni of addrs ?? []) {
+      if (ni.family === 'IPv4' && !ni.internal) return ni.address;
+    }
+  }
+  return null;
+}
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -35,8 +46,10 @@ function createWindow(): void {
 const { session, hub } = registerIpc(() => mainWindow);
 
 let server: ServerHandle | null = null;
-// Expose the pairing code + port so the renderer can show "pair your iPad" details.
-ipcMain.handle('dsp:serverInfo', () => (server ? { port: server.port, code: server.code } : null));
+// Expose the pairing code + port + LAN IP so the renderer can show "pair your iPad" details.
+ipcMain.handle('dsp:serverInfo', () =>
+  server ? { port: server.port, code: server.code, ip: lanIp() } : null,
+);
 
 app.whenReady().then(async () => {
   createWindow();
