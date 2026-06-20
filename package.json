@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "dev": "electron-vite dev",
+    "dev:web": "vite --config vite.web.config.ts",
     "build": "npm run typecheck && electron-vite build",
     "package": "npm run build && electron-builder",
     "test": "npm run test --workspaces --if-present && vitest run",

@@ -41,6 +41,7 @@ interface DspStore {
   setCompressor: (ch: number, patch: Partial<ChannelState['compressor']>) => void;
   setGate: (ch: number, patch: Partial<ChannelState['gate']>) => void;
   setGeqBand: (ch: number, band: number, db: number) => void;
+  muteAll: (muted: boolean) => void;
 }
 
 export const useStore = create<DspStore>((set, get) => ({
@@ -96,6 +97,7 @@ export const useStore = create<DspStore>((set, get) => ({
   setCompressor: (ch, patch) => void window.dsp.dispatch('setCompressor', { ch, ...patch }),
   setGate: (ch, patch) => void window.dsp.dispatch('setGate', { ch, ...patch }),
   setGeqBand: (ch, band, db) => void window.dsp.dispatch('setGeqBand', { ch, band, db }),
+  muteAll: (muted) => void window.dsp.dispatch('muteAll', { muted }),
 }));
 
 // Controls are live only when a real device is connected or demo mode is on.

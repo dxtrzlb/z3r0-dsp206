@@ -1,17 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useStore, CHANNELS } from './store';
 import { ChannelStrip } from './components/ChannelStrip';
+import { TopBar, type View } from './components/TopBar';
+
+const INPUTS = [0, 1];
+const OUTPUTS = [2, 3, 4, 5, 6, 7];
 
 export function App() {
-  const status = useStore((s) => s.status);
-  const detail = useStore((s) => s.detail);
-  const present = useStore((s) => s.present);
-  const device = useStore((s) => s.device);
+  const [view, setView] = useState<View>('edit');
   const demoMode = useStore((s) => s.demoMode);
   const bind = useStore((s) => s.bind);
-  const connect = useStore((s) => s.connect);
-  const disconnect = useStore((s) => s.disconnect);
-  const setDemoMode = useStore((s) => s.setDemoMode);
   const refreshPresent = useStore((s) => s.refreshPresent);
 
   useEffect(() => {
@@ -40,57 +38,40 @@ export function App() {
     return () => clearInterval(id);
   }, [demoMode]);
 
-  const connected = status === 'connected';
-
   return (
     <div className="app">
-      <header className="topbar">
-        <div className="brand">
-          z3r0 <span>DSP 206</span>
-        </div>
+      <TopBar view={view} setView={setView} />
 
-        <div className="conn">
-          <div className="device-label">
-            <span className="device-prefix">Device Detected:</span>
-            <span className={`device-value ${device ? 'found' : 'none'}`}>
-              {device ? (device.product ?? 'Dsp Process') : 'No device'}
-            </span>
-          </div>
-          {demoMode && <span className="demo-tag">DEMO</span>}
-          <span className={`dot ${demoMode ? 'demo' : status}`} />
-          <span className="status-text">
-            {connected
-              ? 'Connected'
-              : demoMode
-                ? 'Demo mode'
-                : status === 'error'
-                  ? `Error: ${detail ?? ''}`
-                  : 'Disconnected'}
-          </span>
-          {connected ? (
-            <button className="btn" onClick={() => disconnect()}>
-              Disconnect
-            </button>
-          ) : (
-            <button className="btn primary" onClick={() => connect()} disabled={!present}>
-              {present ? 'Connect' : 'No device'}
-            </button>
-          )}
-          <button
-            className={`btn ${demoMode ? 'active' : ''}`}
-            onClick={() => setDemoMode(!demoMode)}
-            disabled={connected}
-          >
-            {demoMode ? 'Exit demo' : 'Demo mode'}
-          </button>
-        </div>
-      </header>
+      {view === 'edit' && (
+        <div className="workspace">
+          <aside className="rail">
+            <div className="rail-title">Inputs</div>
+            <div className="rail-cards">
+              {INPUTS.map((ch) => (
+                <ChannelStrip key={ch} ch={ch} />
+              ))}
+            </div>
+          </aside>
 
-      <main className="strips">
-        {CHANNELS.map((_, ch) => (
-          <ChannelStrip key={ch} ch={ch} />
-        ))}
-      </main>
+          <section className="stage">
+            <div className="stage-main">
+              <div className="stage-placeholder">Frequency View — next increment</div>
+            </div>
+            <div className="output-bar">
+              {OUTPUTS.map((ch) => (
+                <ChannelStrip key={ch} ch={ch} />
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
+
+      {view === 'safety' && (
+        <div className="view-placeholder">Safety Mode — fullscreen system health (coming)</div>
+      )}
+      {view === 'party' && (
+        <div className="view-placeholder">Party Mode — large monitor view (coming)</div>
+      )}
     </div>
   );
 }

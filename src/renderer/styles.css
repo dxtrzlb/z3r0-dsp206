@@ -18,6 +18,13 @@
   box-sizing: border-box;
 }
 
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -29,7 +36,7 @@ body {
 .app {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
 }
 
 .topbar {
@@ -137,13 +144,101 @@ body {
   cursor: not-allowed;
 }
 
-.strips {
+.workspace {
   flex: 1;
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  display: flex;
+  min-height: 0;
   gap: 12px;
-  padding: 18px;
-  overflow: auto;
+  padding: 14px;
+  overflow: hidden;
+}
+.rail {
+  width: 220px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rail-title {
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rail-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+}
+.stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.stage-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  min-height: 0;
+}
+.stage-placeholder,
+.view-placeholder {
+  color: var(--muted);
+  font-size: 14px;
+}
+.view-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.output-bar {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  height: 300px;
+}
+
+.view-switch {
+  display: flex;
+  gap: 4px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 3px;
+}
+.view-tab {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.view-tab.on {
+  background: var(--accent-2);
+  color: #fff;
+}
+.btn.mute-all {
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+  font-weight: 700;
+}
+.btn.mute-all.engaged {
+  background: var(--danger);
+  color: #fff;
 }
 
 .strip {
