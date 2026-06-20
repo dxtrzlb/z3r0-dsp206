@@ -493,6 +493,68 @@ body {
   gap: 8px;
 }
 
+.dyn-tab {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.dyn-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.delay-tab {
+  max-width: 520px;
+}
+.delay-readout {
+  display: flex;
+  gap: 22px;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.delay-readout span {
+  color: var(--accent);
+}
+.gate-tab {
+  max-width: 420px;
+}
+
+.geq-tab {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 100%;
+  overflow-x: auto;
+}
+.geq-band {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+}
+.geq-fader-track {
+  height: 96px;
+  width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.geq-fader {
+  width: 96px;
+  transform: rotate(-90deg);
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.geq-label {
+  font-size: 9px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
 .strip {
   background: var(--panel);
   border: 1px solid var(--line);
