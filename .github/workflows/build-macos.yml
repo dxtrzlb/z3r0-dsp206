@@ -1,0 +1,49 @@
+name: Build macOS installer
+
+# Builds the desktop app into unsigned .dmg installers on macOS runners.
+# Trigger manually from the Actions tab ("Run workflow"), or by pushing a v* tag.
+# Two arches are built so the result runs on both Intel and Apple Silicon Macs.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-dmg:
+    name: Build .dmg (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-13 # Intel
+            arch: x64
+          - runner: macos-14 # Apple Silicon
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (typecheck + electron-vite bundle)
+        run: npm run build
+
+      - name: Package unsigned .dmg
+        run: npx electron-builder --mac dmg --${{ matrix.arch }} --publish never
+        env:
+          # No Apple Developer cert in CI — build unsigned (Gatekeeper: right-click > Open).
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: z3r0-dsp206-macos-${{ matrix.arch }}
+          path: release/*.dmg
+          if-no-files-found: error
