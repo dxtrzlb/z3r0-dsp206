@@ -6,6 +6,7 @@ import { RoutingMatrix } from './components/RoutingMatrix';
 import { OutputEditor } from './components/OutputEditor';
 import { SafetyView } from './components/SafetyView';
 import { PartyView } from './components/PartyView';
+import { PresetBar } from './components/PresetBar';
 import { TopBar, type View } from './components/TopBar';
 
 const INPUTS = [0, 1];
@@ -56,6 +57,7 @@ export function App() {
   return (
     <div className="app">
       <TopBar view={view} setView={setView} />
+      <PresetBar />
 
       {view === 'edit' && (
         <div className="workspace">

@@ -731,6 +731,40 @@ body {
   background: var(--danger);
 }
 
+.presetbar {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  padding: 8px 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+.preset-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.preset-label {
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.preset-select {
+  flex: none;
+  width: auto;
+  min-width: 120px;
+}
+.preset-name {
+  width: 130px;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+
 .strip {
   background: var(--panel);
   border: 1px solid var(--line);
