@@ -872,71 +872,6 @@ body {
   cursor: pointer;
 }
 
-.strip-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.block {
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 10px;
-}
-.block-head {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
-.block-head .val {
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
-}
-.block input[type='range'] {
-  width: 100%;
-  accent-color: var(--accent);
-}
-
-.matrix-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-.matrix-row:last-child {
-  margin-bottom: 0;
-}
-.matrix-row input[type='range'] {
-  flex: 1;
-  accent-color: var(--accent);
-}
-.matrix-row .val {
-  font-size: 11px;
-  color: var(--muted);
-  width: 22px;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-.route {
-  border: 1px solid var(--line);
-  background: var(--panel);
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 6px;
-  border-radius: 6px;
-  cursor: pointer;
-  width: 44px;
-}
-.route.on {
-  background: var(--accent-2);
-  border-color: var(--accent);
-  color: #fff;
-}
-
 .mute {
   border: 1px solid var(--line);
   background: var(--panel-2);
@@ -958,8 +893,7 @@ input[type='range']:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
-.mute:disabled,
-.route:disabled {
+.mute:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
