@@ -2,6 +2,7 @@
   "name": "z3r0-dsp206",
   "version": "0.1.0",
   "description": "z3r0 DSP 206 — t.racks DSP 206 USB-HID controller",
+  "author": "z3r0",
   "type": "module",
   "private": true,
   "main": "./out/main/index.js",
@@ -9,6 +10,43 @@
     "packages/*",
     "apps/*"
   ],
+  "build": {
+    "appId": "com.z3r0.dsp206",
+    "productName": "z3r0 DSP 206",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "out/**",
+      "!node_modules/@z3r0/**"
+    ],
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.music"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "AudioVideo"
+    }
+  },
   "scripts": {
     "dev": "electron-vite dev",
     "dev:web": "vite --config vite.web.config.ts",
