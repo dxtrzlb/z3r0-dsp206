@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useStore, CHANNELS } from './store';
 import { ChannelStrip } from './components/ChannelStrip';
 import { FreqView } from './components/FreqView';
+import { RoutingMatrix } from './components/RoutingMatrix';
 import { TopBar, type View } from './components/TopBar';
 
 const INPUTS = [0, 1];
@@ -62,6 +63,8 @@ export function App() {
                 <ChannelStrip key={ch} ch={ch} />
               ))}
             </div>
+            <div className="rail-title">Routing</div>
+            <RoutingMatrix />
           </aside>
 
           <section className="stage">
