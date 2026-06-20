@@ -1,55 +1,46 @@
-import { useEffect } from 'react';
-import { SafeAreaView, View, Text, Pressable, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { SafeAreaView, View, Text, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
-import { meterDbfs, statusOf, type HealthStatus } from '@z3r0/core';
-import { useStore, CHANNELS } from './src/store';
+import { useStore } from './src/store';
 import { ConnectScreen } from './src/screens/ConnectScreen';
+import { TopBar, type AppView } from './src/components/TopBar';
+import { ChannelStrip } from './src/components/ChannelStrip';
+import { RoutingMatrix } from './src/components/RoutingMatrix';
 import { theme } from './src/theme';
 
-const STATUS_COLOR: Record<HealthStatus, string> = {
-  safe: theme.safe,
-  warning: theme.warn,
-  clip: theme.clip,
-};
+const INPUTS = [0, 1];
+const OUTPUTS = [2, 3, 4, 5, 6, 7];
 
-function Meter({ label, level }: { label: string; level: number }) {
-  const db = meterDbfs(level);
-  const pct = Math.max(0, Math.min(100, ((db + 60) / 60) * 100));
-  const color = STATUS_COLOR[statusOf(level)];
+function EditView() {
   return (
-    <View style={styles.meterCol}>
-      <View style={styles.meterTrack}>
-        <View style={[styles.meterFill, { height: `${pct}%`, backgroundColor: color }]} />
+    <View style={styles.edit}>
+      <View style={styles.rail}>
+        <Text style={styles.section}>Inputs</Text>
+        <View style={styles.inputRow}>
+          {INPUTS.map((ch) => (
+            <ChannelStrip key={ch} ch={ch} />
+          ))}
+        </View>
+        <Text style={styles.section}>Routing</Text>
+        <RoutingMatrix />
       </View>
-      <Text style={styles.meterLabel}>{label}</Text>
+      <View style={styles.main}>
+        <Text style={styles.section}>Outputs</Text>
+        <View style={styles.outRow}>
+          {OUTPUTS.map((ch) => (
+            <ChannelStrip key={ch} ch={ch} />
+          ))}
+        </View>
+      </View>
     </View>
   );
 }
 
-function ConnectedView() {
-  const host = useStore((s) => s.host);
-  const meters = useStore((s) => s.meters);
-  const disconnect = useStore((s) => s.forget);
-
+function Placeholder({ label }: { label: string }) {
   return (
-    <View style={styles.connected}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.brand}>z3r0 DSP 206</Text>
-          <Text style={styles.headerSub}>Connected · {host}</Text>
-        </View>
-        <Pressable style={styles.disconnect} onPress={() => void disconnect()}>
-          <Text style={styles.disconnectText}>Disconnect</Text>
-        </Pressable>
-      </View>
-      <Text style={styles.sectionLabel}>Live meters</Text>
-      <View style={styles.meters}>
-        {CHANNELS.map((label, ch) => (
-          <Meter key={ch} label={label} level={meters[ch] ?? 0} />
-        ))}
-      </View>
-      <Text style={styles.note}>Full mixing-desk controls land in the next build step.</Text>
+    <View style={styles.placeholder}>
+      <Text style={styles.placeholderText}>{label} view — coming in the next build step</Text>
     </View>
   );
 }
@@ -57,6 +48,7 @@ function ConnectedView() {
 export default function App() {
   const connected = useStore((s) => s.status === 'connected');
   const init = useStore((s) => s.init);
+  const [view, setView] = useState<AppView>('edit');
 
   useEffect(() => {
     void init();
@@ -66,7 +58,16 @@ export default function App() {
     <GestureHandlerRootView style={styles.flex}>
       <SafeAreaView style={styles.flex}>
         <StatusBar style="light" />
-        {connected ? <ConnectedView /> : <ConnectScreen />}
+        {connected ? (
+          <View style={styles.flex}>
+            <TopBar view={view} setView={setView} />
+            {view === 'edit' && <EditView />}
+            {view === 'safety' && <Placeholder label="Safety" />}
+            {view === 'party' && <Placeholder label="Party" />}
+          </View>
+        ) : (
+          <ConnectScreen />
+        )}
       </SafeAreaView>
     </GestureHandlerRootView>
   );
@@ -74,17 +75,12 @@ export default function App() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: theme.bg },
-  connected: { flex: 1, padding: 20 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  brand: { color: theme.text, fontSize: 20, fontWeight: '800', letterSpacing: 0.5 },
-  headerSub: { color: theme.dim, fontSize: 13, marginTop: 2 },
-  disconnect: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: theme.line },
-  disconnectText: { color: theme.text, fontWeight: '600' },
-  sectionLabel: { color: theme.dim, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 },
-  meters: { flexDirection: 'row', gap: 12, height: 220 },
-  meterCol: { alignItems: 'center', flex: 1 },
-  meterTrack: { flex: 1, width: 28, backgroundColor: theme.panel2, borderRadius: 6, borderWidth: 1, borderColor: theme.line, justifyContent: 'flex-end', overflow: 'hidden' },
-  meterFill: { width: '100%', borderRadius: 5 },
-  meterLabel: { color: theme.dim, fontSize: 11, marginTop: 6 },
-  note: { color: theme.dim, fontSize: 13, marginTop: 24, fontStyle: 'italic' },
+  edit: { flex: 1, flexDirection: 'row', padding: 16, gap: 16 },
+  rail: { width: 320, gap: 10 },
+  inputRow: { flexDirection: 'row', gap: 10, height: 240 },
+  main: { flex: 1, gap: 10 },
+  outRow: { flex: 1, flexDirection: 'row', gap: 10 },
+  section: { color: theme.dim, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5 },
+  placeholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  placeholderText: { color: theme.dim, fontSize: 15, fontStyle: 'italic' },
 });
