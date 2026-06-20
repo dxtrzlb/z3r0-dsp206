@@ -3,6 +3,7 @@ import { useStore, CHANNELS } from './store';
 import { ChannelStrip } from './components/ChannelStrip';
 import { FreqView } from './components/FreqView';
 import { RoutingMatrix } from './components/RoutingMatrix';
+import { OutputEditor } from './components/OutputEditor';
 import { TopBar, type View } from './components/TopBar';
 
 const INPUTS = [0, 1];
@@ -72,6 +73,7 @@ export function App() {
             <div className="stage-main">
               <FreqView />
             </div>
+            <OutputEditor />
             <div className="output-bar">
               {OUTPUTS.map((ch) => (
                 <ChannelStrip key={ch} ch={ch} />
