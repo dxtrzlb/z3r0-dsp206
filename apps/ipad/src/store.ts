@@ -49,6 +49,10 @@ interface Store {
   setGate: (ch: number, patch: Partial<ChannelState['gate']>) => void;
   setGeqBand: (ch: number, band: number, db: number) => void;
   muteAll: (muted: boolean) => void;
+  setInputSignal: (signal: 'analog' | 'sine' | 'pink' | 'white', sineFreqIndex?: number) => void;
+  loadPreset: (presetNum: number) => void;
+  storePreset: (slot: number) => void;
+  setPresetName: (name: string) => void;
 }
 
 export const useStore = create<Store>((set) => {
@@ -106,6 +110,11 @@ export const useStore = create<Store>((set) => {
     setGate: (ch, patch) => client.dispatch('setGate', { ch, ...patch }),
     setGeqBand: (ch, band, db) => client.dispatch('setGeqBand', { ch, band, db }),
     muteAll: (muted) => client.dispatch('muteAll', { muted }),
+    setInputSignal: (signal, sineFreqIndex) =>
+      client.dispatch('setInputSignal', sineFreqIndex == null ? { signal } : { signal, sineFreqIndex }),
+    loadPreset: (presetNum) => client.dispatch('loadPreset', { presetNum }),
+    storePreset: (slot) => client.dispatch('storePreset', { slot }),
+    setPresetName: (name) => client.dispatch('setPresetName', { name }),
   };
 });
 
