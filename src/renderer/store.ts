@@ -34,8 +34,8 @@ interface DspStore {
   setPeqBand: (ch: number, band: number, patch: Partial<PeqBand>) => void;
   addPeqBand: (ch: number) => void;
   removePeqBand: (ch: number) => void;
-  setHpf: (ch: number, patch: Partial<{ hz: number; on: boolean }>) => void;
-  setLpf: (ch: number, patch: Partial<{ hz: number; on: boolean }>) => void;
+  setHpf: (ch: number, patch: Partial<{ hz: number; on: boolean; slope: number }>) => void;
+  setLpf: (ch: number, patch: Partial<{ hz: number; on: boolean; slope: number }>) => void;
   setDelay: (ch: number, ms: number) => void;
   setLimiter: (ch: number, patch: Partial<ChannelState['limiter']>) => void;
   setCompressor: (ch: number, patch: Partial<ChannelState['compressor']>) => void;

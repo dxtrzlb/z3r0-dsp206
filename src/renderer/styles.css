@@ -181,13 +181,24 @@ body {
 }
 .stage-main {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
   min-height: 0;
+  overflow: hidden;
+}
+.stage-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.stage-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+.stage-sub {
+  font-size: 11px;
+  color: var(--muted);
 }
 .stage-placeholder,
 .view-placeholder {
@@ -239,6 +250,45 @@ body {
 .btn.mute-all.engaged {
   background: var(--danger);
   color: #fff;
+}
+
+.freq-graph {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.freq-graph .plot-bg {
+  fill: #0a0b0f;
+}
+.freq-graph .grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.freq-graph .grid.zero {
+  stroke: #3a4055;
+  stroke-width: 1.5;
+}
+.freq-graph .ax {
+  fill: var(--muted);
+  font-size: 11px;
+}
+.freq-graph .curve {
+  fill: none;
+  stroke-width: 2.5;
+}
+.freq-graph .eq-node circle {
+  stroke: #0e0f13;
+  stroke-width: 2;
+  cursor: grab;
+}
+.freq-graph .eq-node:active circle {
+  cursor: grabbing;
+}
+.freq-graph .eq-node-num {
+  fill: #0e0f13;
+  font-size: 12px;
+  font-weight: 700;
+  pointer-events: none;
 }
 
 .strip {

@@ -17,8 +17,8 @@ export interface ChannelState {
   routeMask: number; // outputs: bit 0 = In A, bit 1 = In B
   inLevel: [number, number]; // outputs: per-input matrix level dB
   peq: PeqBand[];
-  hpf: { hz: number; on: boolean };
-  lpf: { hz: number; on: boolean };
+  hpf: { hz: number; on: boolean; slope: number };
+  lpf: { hz: number; on: boolean; slope: number };
   delayMs: number;
   limiter: { attackMs: number; releaseMs: number; threshDb: number };
   compressor: { ratio: number; attackMs: number; releaseMs: number; kneeDb: number; threshDb: number };
@@ -40,8 +40,8 @@ export const defaultChannel = (): ChannelState => ({
   routeMask: 0,
   inLevel: [0, 0],
   peq: [defaultBand(120), defaultBand(1000), defaultBand(8000)],
-  hpf: { hz: 20, on: false },
-  lpf: { hz: 20000, on: false },
+  hpf: { hz: 20, on: false, slope: 9 },
+  lpf: { hz: 20000, on: false, slope: 9 },
   delayMs: 0,
   limiter: { attackMs: 50, releaseMs: 500, threshDb: 0 },
   compressor: { ratio: 0, attackMs: 50, releaseMs: 500, kneeDb: 0, threshDb: 0 },

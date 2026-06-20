@@ -23,8 +23,8 @@ describe('command registry', () => {
 
   it('setHpf off sends the minimum frequency but keeps the stored hz', () => {
     const r = dispatch(defaultState(), 'setHpf', { ch: 2, hz: 100, on: false });
-    expect(r.state.channels[2].hpf).toEqual({ hz: 100, on: false });
-    expect(r.frames).toEqual([setHpf(2, FREQ_MIN)]);
+    expect(r.state.channels[2].hpf).toEqual({ hz: 100, on: false, slope: 9 });
+    expect(r.frames).toEqual([setHpf(2, FREQ_MIN, 9)]);
   });
 
   it('partial limiter update merges with current and preserves a 0 threshold', () => {

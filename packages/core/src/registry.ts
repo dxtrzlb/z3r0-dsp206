@@ -48,7 +48,12 @@ const routeP = z.object({ outCh, inIdx, on: z.boolean() });
 const levelP = z.object({ outCh, inIdx, db });
 const peqBandP = z.object({ ch, band: z.number().int().min(0), patch: peqPatch });
 const peqAddP = z.object({ ch });
-const xoverP = z.object({ ch, hz: z.number().optional(), on: z.boolean().optional() });
+const xoverP = z.object({
+  ch,
+  hz: z.number().optional(),
+  on: z.boolean().optional(),
+  slope: z.number().int().min(0).max(19).optional(),
+});
 const delayP = z.object({ ch, ms: z.number().min(0) });
 const limiterP = z.object({
   ch,
@@ -193,13 +198,11 @@ export const COMMANDS = {
     description: 'Set the high-pass filter frequency and on/off.',
     params: xoverP,
     apply: (p, s) => {
-      const hpf = {
-        hz: p.hz === undefined ? s.channels[p.ch].hpf.hz : p.hz,
-        on: p.on === undefined ? s.channels[p.ch].hpf.on : p.on,
-      };
+      const cur = s.channels[p.ch].hpf;
+      const hpf = { hz: p.hz ?? cur.hz, on: p.on ?? cur.on, slope: p.slope ?? cur.slope };
       return {
         state: patchChannel(s, p.ch, (c) => ({ ...c, hpf })),
-        frames: [build.setHpf(p.ch, hpf.on ? hpf.hz : FREQ_MIN)],
+        frames: [build.setHpf(p.ch, hpf.on ? hpf.hz : FREQ_MIN, hpf.slope)],
       };
     },
   }),
@@ -208,13 +211,11 @@ export const COMMANDS = {
     description: 'Set the low-pass filter frequency and on/off.',
     params: xoverP,
     apply: (p, s) => {
-      const lpf = {
-        hz: p.hz === undefined ? s.channels[p.ch].lpf.hz : p.hz,
-        on: p.on === undefined ? s.channels[p.ch].lpf.on : p.on,
-      };
+      const cur = s.channels[p.ch].lpf;
+      const lpf = { hz: p.hz ?? cur.hz, on: p.on ?? cur.on, slope: p.slope ?? cur.slope };
       return {
         state: patchChannel(s, p.ch, (c) => ({ ...c, lpf })),
-        frames: [build.setLpf(p.ch, lpf.on ? lpf.hz : FREQ_MAX)],
+        frames: [build.setLpf(p.ch, lpf.on ? lpf.hz : FREQ_MAX, lpf.slope)],
       };
     },
   }),

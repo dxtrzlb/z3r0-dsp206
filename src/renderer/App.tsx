@@ -1,10 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useStore, CHANNELS } from './store';
 import { ChannelStrip } from './components/ChannelStrip';
+import { FreqView } from './components/FreqView';
 import { TopBar, type View } from './components/TopBar';
 
 const INPUTS = [0, 1];
 const OUTPUTS = [2, 3, 4, 5, 6, 7];
+
+function StageHead() {
+  const selected = useStore((s) => s.selected);
+  return (
+    <div className="stage-head">
+      <span className="stage-title">{CHANNELS[selected]}</span>
+      <span className="stage-sub">Frequency response · drag node = freq + gain · wheel = Q</span>
+    </div>
+  );
+}
 
 export function App() {
   const [view, setView] = useState<View>('edit');
@@ -54,8 +65,9 @@ export function App() {
           </aside>
 
           <section className="stage">
+            <StageHead />
             <div className="stage-main">
-              <div className="stage-placeholder">Frequency View — next increment</div>
+              <FreqView />
             </div>
             <div className="output-bar">
               {OUTPUTS.map((ch) => (

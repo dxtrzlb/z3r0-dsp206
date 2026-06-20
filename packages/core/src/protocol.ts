@@ -65,19 +65,6 @@ export const RATIO_LADDER = [
   'Lmt',
 ] as const;
 
-// Slope ladder names from dsp-408 (§6). Not yet live on the 206 — UI shows it disabled.
-export const SLOPE_LADDER: { label: string; value: number }[] = [
-  { label: 'BW 6', value: 0 },
-  { label: 'BW 12', value: 1 },
-  { label: 'BW 18', value: 2 },
-  { label: 'BW 24', value: 3 },
-  { label: 'BW 36', value: 5 },
-  { label: 'BW 48', value: 7 },
-  { label: 'LR 12', value: 8 },
-  { label: 'LR 24', value: 9 },
-  { label: 'LR 48', value: 11 },
-];
-
 const clamp = (v: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, v));
 
 export const u16le = (v: number): [number, number] => [v & 0xff, (v >> 8) & 0xff];
