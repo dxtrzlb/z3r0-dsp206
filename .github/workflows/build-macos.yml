@@ -16,9 +16,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: macos-13 # Intel
+          # GitHub's macos-13 (Intel) runners are scarce/deprecated and can queue for hours, so
+          # build BOTH arches on the readily-available arm64 runner. The dmg is only packaged
+          # (not executed) on the builder, and node-hid ships prebuilds for both arches.
+          - runner: macos-14
             arch: x64
-          - runner: macos-14 # Apple Silicon
+          - runner: macos-14
             arch: arm64
     runs-on: ${{ matrix.runner }}
     steps:
