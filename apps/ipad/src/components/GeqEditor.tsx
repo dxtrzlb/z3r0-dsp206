@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, type LayoutChangeEvent } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useStore } from '../store';
+import { useThrottledCallback } from '../hooks/useThrottledCallback';
 import { theme } from '../theme';
 
 const BANDS = 31;
@@ -12,23 +13,19 @@ const RANGE = 12; // ±dB
 export function GeqEditor({ ch }: { ch: number }) {
   const geq = useStore((s) => s.channels[ch].geq);
   const setGeqBand = useStore((s) => s.setGeqBand);
+  const throttledSet = useThrottledCallback(setGeqBand, 40);
 
   const sizeRef = useRef({ w: 1, h: 1 });
-  const last = useRef(0);
-  const setRef = useRef(setGeqBand);
+  const dispatchRef = useRef(throttledSet);
   const chRef = useRef(ch);
-  setRef.current = setGeqBand;
+  dispatchRef.current = throttledSet;
   chRef.current = ch;
 
   const apply = (x: number, y: number) => {
     const { w, h } = sizeRef.current;
     const band = Math.max(0, Math.min(BANDS - 1, Math.floor((x / w) * BANDS)));
     const db = Math.max(-RANGE, Math.min(RANGE, (0.5 - y / h) * 2 * RANGE));
-    const now = Date.now();
-    if (now - last.current > 30) {
-      last.current = now;
-      setRef.current(chRef.current, band, Number(db.toFixed(1)));
-    }
+    dispatchRef.current(chRef.current, band, Number(db.toFixed(1)));
   };
 
   const pan = useMemo(

@@ -1,10 +1,11 @@
 import { useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, type LayoutChangeEvent } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { useThrottledCallback } from '../hooks/useThrottledCallback';
 import { theme } from '../theme';
 
-// Reusable horizontal value slider. A Pan gesture maps drag distance (right = higher) to the
-// value range. runOnJS(true) keeps the handlers on the JS thread — no reanimated dependency.
+// Reusable horizontal value slider. Tracks the finger immediately (optimistic `local`) and dispatches
+// onChange throttled (trailing-edge), so dragging a control doesn't flood the link.
 export function Slider({
   label,
   value,
@@ -26,41 +27,48 @@ export function Slider({
 }) {
   const range = max - min;
   const [width, setWidth] = useState(1);
+  const [local, setLocal] = useState<number | null>(null);
   const widthRef = useRef(1);
-  const valueRef = useRef(value);
   const startRef = useRef(value);
-  const onChangeRef = useRef(onChange);
+  const shownRef = useRef(value);
   const onCommitRef = useRef(onCommit);
+  const dispatch = useThrottledCallback(onChange, 40);
+  const dispatchRef = useRef(dispatch);
   widthRef.current = width;
-  valueRef.current = value;
-  onChangeRef.current = onChange;
   onCommitRef.current = onCommit;
+  dispatchRef.current = dispatch;
 
   const quantize = (v: number): number => {
     const clamped = Math.max(min, Math.min(max, v));
-    if (!step) return clamped;
-    return Math.round(clamped / step) * step;
+    return step ? Math.round(clamped / step) * step : clamped;
   };
+
+  const shown = local ?? value;
+  shownRef.current = shown;
 
   const pan = useMemo(
     () =>
       Gesture.Pan()
         .runOnJS(true)
         .onBegin(() => {
-          startRef.current = valueRef.current;
+          startRef.current = shownRef.current;
         })
         .onUpdate((e) => {
-          const next = startRef.current + (e.translationX / widthRef.current) * range;
-          onChangeRef.current(quantize(next));
+          const next = quantize(startRef.current + (e.translationX / widthRef.current) * range);
+          setLocal(next);
+          dispatchRef.current(next);
         })
-        .onEnd(() => onCommitRef.current?.()),
+        .onEnd(() => {
+          setLocal(null);
+          onCommitRef.current?.();
+        }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [min, max, range, step],
   );
 
-  const pct = Math.max(0, Math.min(100, ((value - min) / range) * 100));
+  const pct = Math.max(0, Math.min(100, ((shown - min) / range) * 100));
   const decimals = step && step < 1 ? 1 : 0;
-  const text = `${value.toFixed(decimals)}${unit ?? ''}`;
+  const text = `${shown.toFixed(decimals)}${unit ?? ''}`;
   const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
 
   return (

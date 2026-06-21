@@ -4,6 +4,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Svg, { Path, Line, Circle, Text as SvgText, Rect } from 'react-native-svg';
 import { channelResponseDb, logFreqs, freqToPos, posToFreq } from '@z3r0/core';
 import { useStore } from '../store';
+import { useThrottledCallback } from '../hooks/useThrottledCallback';
 import { theme } from '../theme';
 
 // SVG frequency-response graph ported from the desktop renderer's FreqView. Log x (20 Hz–20 kHz),
@@ -27,6 +28,7 @@ const fmtHz = (hz: number): string => (hz >= 1000 ? `${hz / 1000}k` : `${hz}`);
 export function FreqView({ ch }: { ch: number }) {
   const channel = useStore((s) => s.channels[ch]);
   const setPeqBand = useStore((s) => s.setPeqBand);
+  const throttledPeq = useThrottledCallback(setPeqBand, 40);
 
   const [sel, setSel] = useState(0);
   const [size, setSize] = useState({ w: 1, h: 1 });
@@ -64,7 +66,7 @@ export function FreqView({ ch }: { ch: number }) {
     const hz = Math.round(clamp(posToFreq(pos), 20, 20000));
     const dbRaw = DB_MAX - ((y - y0) / Math.max(1, y1 - y0)) * (DB_MAX - DB_MIN);
     const gainDb = clamp(Math.round(dbRaw * 10) / 10, -GAIN_CLAMP, GAIN_CLAMP);
-    setPeqBand(ch, band, { hz, gainDb });
+    throttledPeq(ch, band, { hz, gainDb });
   };
 
   // Pick the active band whose node is nearest the grab point (ignoring bypassed bands).

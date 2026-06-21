@@ -1,4 +1,3 @@
-import { useRef, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useStore, CHANNELS, isInput } from '../store';
 import { Meter } from './Meter';
@@ -6,7 +5,8 @@ import { Fader } from './Fader';
 import { theme } from '../theme';
 
 // One channel: name + IN/OUT tag, live meter beside a gain fader, and a mute button.
-// Tapping the strip selects the channel (for the detail editor in a later step).
+// Tapping the strip selects the channel (for the detail editor). The Fader handles optimistic
+// display + throttled dispatch internally.
 export function ChannelStrip({ ch }: { ch: number }) {
   const gainDb = useStore((s) => s.channels[ch].gainDb);
   const muted = useStore((s) => s.channels[ch].muted);
@@ -15,22 +15,6 @@ export function ChannelStrip({ ch }: { ch: number }) {
   const select = useStore((s) => s.select);
   const setGain = useStore((s) => s.setGain);
   const setMute = useStore((s) => s.setMute);
-
-  // Show the dragged value immediately; throttle the dispatch so we don't flood the socket.
-  const [live, setLive] = useState<number | null>(null);
-  const lastSent = useRef(0);
-  const onChange = (v: number) => {
-    setLive(v);
-    const now = Date.now();
-    if (now - lastSent.current > 40) {
-      lastSent.current = now;
-      setGain(ch, Number(v.toFixed(1)));
-    }
-  };
-  const onCommit = () => {
-    if (live !== null) setGain(ch, Number(live.toFixed(1)));
-    setLive(null);
-  };
 
   return (
     <Pressable style={[styles.strip, selected && styles.selected]} onPress={() => select(ch)}>
@@ -42,7 +26,7 @@ export function ChannelStrip({ ch }: { ch: number }) {
       </View>
       <View style={styles.body}>
         <Meter level={level} />
-        <Fader value={live ?? gainDb} min={-60} max={20} onChange={onChange} onCommit={onCommit} />
+        <Fader value={gainDb} min={-60} max={20} onChange={(v) => setGain(ch, Number(v.toFixed(1)))} />
       </View>
       <Pressable style={[styles.mute, muted && styles.muteOn]} onPress={() => setMute(ch, !muted)}>
         <Text style={[styles.muteText, muted && styles.muteTextOn]}>{muted ? 'MUTED' : 'MUTE'}</Text>
