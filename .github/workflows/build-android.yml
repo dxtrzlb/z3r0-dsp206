@@ -1,0 +1,46 @@
+name: Build Android APK
+
+# Builds a directly-installable (debug-signed) Android APK on an Ubuntu runner with a pinned
+# JDK 17 — no Google Play account or local Android toolchain needed. Trigger from the Actions
+# tab ("Run workflow") or by pushing a v* tag. Sideload the APK: enable "install unknown apps".
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate the native Android project
+        run: npx expo prebuild --platform android --no-install
+        working-directory: apps/ipad
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon
+        working-directory: apps/ipad/android
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: z3r0-dsp206-android
+          path: apps/ipad/android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
