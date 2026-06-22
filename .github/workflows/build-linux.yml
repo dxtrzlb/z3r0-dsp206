@@ -1,0 +1,37 @@
+name: Build Linux installer
+
+# Builds a portable Linux AppImage on an Ubuntu runner (electron-builder rebuilds native node-hid
+# for linux-x64). Trigger from the Actions tab ("Run workflow") or by pushing a v* tag.
+# To run it: chmod +x the .AppImage and launch it (needs libudev / libfuse2 on the host).
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  appimage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (typecheck + electron-vite bundle)
+        run: npm run build
+
+      - name: Package AppImage
+        run: npx electron-builder --linux AppImage --publish never
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: z3r0-dsp206-linux
+          path: release/*.AppImage
+          if-no-files-found: error
