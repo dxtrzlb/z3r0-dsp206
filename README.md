@@ -7,6 +7,11 @@ An unofficial, cross-platform controller for the **[t.racks DSP 206](https://www
 - **Repo:** https://github.com/dxtrzlb/z3r0-dsp206
 - **Latest release:** https://github.com/dxtrzlb/z3r0-dsp206/releases/latest
 
+> [!CAUTION]
+> **This software has not been properly tested with real amplifiers and speakers.** The protocol is reverse-engineered and some parameters are uncalibrated, so a command may not do what you expect. Incorrect gain, crossover, limiter, or routing settings can **damage amplifiers, destroy drivers, and harm your hearing**.
+>
+> Be very careful. Test at low volume with no speakers/amps connected (or with gear you can afford to lose) before trusting it on anything real, keep the master level down, and verify each change. **You use this entirely at your own risk** — see the [full disclaimer](#notes--disclaimer).
+
 ---
 
 ## Features
@@ -185,4 +190,5 @@ apps/ipad       Expo remote app (iPad / Android)
 ## Notes & disclaimer
 
 - The controller and the **official t.racks editor cannot run at the same time** — both want exclusive ownership of the USB device. Quit one before using the other.
+- **Not properly tested on live rigs.** This has not been validated against a real amplifier-and-speaker system across the full range of settings. Treat every control as potentially dangerous until you have confirmed it behaves as expected at safe levels. A bad gain, crossover, limiter, or routing value can blow drivers and amps and damage hearing.
 - This is an **unofficial** project, not affiliated with or endorsed by Thomann / the t.racks brand. The protocol was reverse-engineered from USB captures. Some dynamics/crossover units are uncalibrated edge cases. **Use at your own risk** — you are responsible for your equipment and your ears.
