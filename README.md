@@ -148,7 +148,7 @@ npm run typecheck && npm run lint && npm test && npm run build
 
 ## Agent access (MCP & OpenAPI)
 
-The desktop hub must be running (it serves the API on `http://127.0.0.1:7206`).
+The desktop hub must be running (it serves the API on `http://127.0.0.1:7206`). For a full step-by-step Windows + Hermes setup, see **[RUNBOOK.md](RUNBOOK.md)**.
 
 **OpenAPI 3.1:** `GET http://127.0.0.1:7206/openapi.json` — one operation per command; destructive operations are flagged `x-destructive`.
 
