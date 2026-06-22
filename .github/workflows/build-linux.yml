@@ -26,6 +26,9 @@ jobs:
       - name: Build (typecheck + electron-vite bundle)
         run: npm run build
 
+      - name: Install node-hid build deps (Linux compiles it against libusb/libudev)
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev libusb-1.0-0-dev
+
       - name: Package AppImage
         run: npx electron-builder --linux AppImage --publish never
 
