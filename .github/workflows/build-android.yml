@@ -1,8 +1,9 @@
 name: Build Android APK
 
-# Builds a directly-installable (debug-signed) Android APK on an Ubuntu runner with a pinned
-# JDK 17 — no Google Play account or local Android toolchain needed. Trigger from the Actions
-# tab ("Run workflow") or by pushing a v* tag. Sideload the APK: enable "install unknown apps".
+# Builds a standalone, installable Android APK on an Ubuntu runner with a pinned JDK 17 — a
+# RELEASE build (the JS bundle is embedded, so it runs WITHOUT a Metro dev server), self-signed
+# with a generated keystore. No Google Play account needed. Trigger from the Actions tab or a
+# v* tag. Sideload it: enable "install unknown apps".
 on:
   workflow_dispatch:
   push:
@@ -34,13 +35,17 @@ jobs:
         run: npx expo prebuild --platform android --no-install
         working-directory: apps/ipad
 
-      - name: Build debug APK
-        run: ./gradlew assembleDebug --no-daemon
+      - name: Generate a signing keystore
+        run: keytool -genkeypair -v -keystore release.keystore -alias z3r0 -keyalg RSA -keysize 2048 -validity 10000 -storepass z3r0dsp -keypass z3r0dsp -dname "CN=z3r0 DSP 206, O=z3r0, C=US"
+        working-directory: apps/ipad/android
+
+      - name: Build release APK (JS bundle embedded — runs without Metro)
+        run: ./gradlew assembleRelease --no-daemon -Pandroid.injected.signing.store.file=$PWD/release.keystore -Pandroid.injected.signing.store.password=z3r0dsp -Pandroid.injected.signing.key.alias=z3r0 -Pandroid.injected.signing.key.password=z3r0dsp
         working-directory: apps/ipad/android
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: z3r0-dsp206-android
-          path: apps/ipad/android/app/build/outputs/apk/debug/*.apk
+          path: apps/ipad/android/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
