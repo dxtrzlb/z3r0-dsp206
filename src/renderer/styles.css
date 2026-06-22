@@ -772,6 +772,19 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.12s, box-shadow 0.12s, background 0.12s;
+}
+.strip.selected {
+  background: color-mix(in srgb, var(--panel) 88%, var(--accent));
+}
+.strip.input.selected {
+  border-color: var(--in);
+  box-shadow: 0 0 0 1px var(--in), 0 0 14px -2px var(--in);
+}
+.strip.output.selected {
+  border-color: var(--out);
+  box-shadow: 0 0 0 1px var(--out), 0 0 14px -2px var(--out);
 }
 .strip-head {
   display: flex;
