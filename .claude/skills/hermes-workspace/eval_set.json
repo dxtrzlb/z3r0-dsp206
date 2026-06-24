@@ -1,0 +1,22 @@
+[
+  {"query": "set output 3 to -6 dB on the dsp, the horns are way too hot tonight", "should_trigger": true},
+  {"query": "what's clipping right now? check the meters", "should_trigger": true},
+  {"query": "recall preset 2 on the 206", "should_trigger": true},
+  {"query": "mute the subs real quick", "should_trigger": true},
+  {"query": "can you pull input A down by 3 dB? it's peaking", "should_trigger": true},
+  {"query": "put an 80 Hz high-pass on outputs 1 and 2, 24 dB/oct", "should_trigger": true},
+  {"query": "route input B into output 1 as well so both mains get it", "should_trigger": true},
+  {"query": "turn on pink noise so i can ring out the room", "should_trigger": true},
+  {"query": "the limiter on the mains is too aggressive, bump the threshold to -3", "should_trigger": true},
+  {"query": "flatten the graphic eq on input b, someone messed with it", "should_trigger": true},
+  {"query": "the setGain command in registry.ts caps db at +20 — change the max to +12 and update the test", "should_trigger": false},
+  {"query": "write a vitest case for the setMute frame builder in packages/core", "should_trigger": false},
+  {"query": "the desktop app won't connect to the DSP over USB — help me debug the node-hid handle", "should_trigger": false},
+  {"query": "document the crossover slope ladder (BW/BL/LK) in DSP206_PROTOCOL.md", "should_trigger": false},
+  {"query": "explain how the limiter threshold byte is encoded in the protocol", "should_trigger": false},
+  {"query": "add a mute button to the output strip in the ipad app", "should_trigger": false},
+  {"query": "what does the x-destructive flag on loadPreset do in the openapi doc?", "should_trigger": false},
+  {"query": "set up a windows firewall rule so hermes can reach the hub on 7206 from my laptop", "should_trigger": false},
+  {"query": "the gain fader in the renderer renders upside down — fix the vertical CSS", "should_trigger": false},
+  {"query": "build and package the windows installer for the desktop app", "should_trigger": false}
+]
