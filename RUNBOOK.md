@@ -43,7 +43,7 @@ $h = @{ Authorization = "Bearer $env:DSP206_TOKEN" }
 Invoke-RestMethod http://127.0.0.1:7206/api/state -Headers $h | ConvertTo-Json -Depth 4
 # mute Out 1 (ch 2):
 Invoke-RestMethod -Method Post http://127.0.0.1:7206/api/command/setMute `
-  -Headers $h -ContentType application/json -Body '{"ch":2,"on":true}'
+  -Headers $h -ContentType application/json -Body '{"ch":2,"muted":true}'
 ```
 
 ## Phase 3 — drive it from Hermes (OpenAPI)
